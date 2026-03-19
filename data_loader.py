@@ -16,15 +16,14 @@ class DataLoader:
         ]
         
     def get_current_price_data(self):
-        """Fetches the current price and 24h change from CryptoCompare."""
+        """Fetches the current price and 24h change from Binance."""
         try:
-            url = f"{self.api_url}/pricemultifull?fsyms=BTC&tsyms=USD"
-            response = requests.get(url, timeout=10)
+            url = "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
             data = response.json()
-            price = data['RAW']['BTC']['USD']['PRICE']
-            change_24h = data['RAW']['BTC']['USD']['CHANGEPCT24HOUR']
-            return {"price": float(price), "change_24h": float(change_24h)}
+            return {"price": float(data['lastPrice']), "change_24h": float(data['priceChangePercent'])}
         except Exception as e:
             print(f"Error fetching real-time data: {e}")
             import streamlit as st
@@ -33,8 +32,9 @@ class DataLoader:
     def get_historical_prices(self, days=365*12):
         """Fetches historical daily prices using CryptoCompare."""
         try:
-            url = f"{self.api_url}/v2/histoday?fsym=BTC&tsym=USD&allData=true"
-            response = requests.get(url, timeout=15)
+            url = "https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&allData=true"
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            response = requests.get(url, headers=headers, timeout=15)
             response.raise_for_status()
             data = response.json()
             
