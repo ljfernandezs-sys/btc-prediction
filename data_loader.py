@@ -1,4 +1,4 @@
-import requests
+import yfinance as yf
 import pandas as pd
 import numpy as np
 import datetime
@@ -16,32 +16,28 @@ class DataLoader:
         ]
         
     def get_current_price_data(self):
-        """Fetches the current price and 24h change from CoinGecko."""
+        """Fetches the current price and 24h change from yfinance."""
         try:
-            url = f"{self.api_url}/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true"
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            price = data['bitcoin']['usd']
-            change_24h = data['bitcoin']['usd_24h_change']
-            return {"price": price, "change_24h": change_24h}
+            ticker = yf.Ticker("BTC-USD")
+            hist = ticker.history(period="5d")
+            current_price = float(hist['Close'].iloc[-1])
+            prev_price = float(hist['Close'].iloc[-2])
+            change_24h = ((current_price / prev_price) - 1) * 100
+            return {"price": current_price, "change_24h": change_24h}
         except Exception as e:
             print(f"Error fetching real-time data: {e}")
             import streamlit as st
-            st.warning("Using offline mode (API Rate Limited)")
+            st.warning("Using offline mode (API Rate Limited / Offline)")
             return {"price": 68450, "change_24h": -1.2}
     def get_historical_prices(self, days=365*12):
-        """Fetches historical daily prices."""
+        """Fetches historical daily prices using yfinance."""
         try:
-            url = f"{self.api_url}/coins/bitcoin/market_chart?vs_currency=usd&days={days}&interval=daily"
-            response = requests.get(url, timeout=15)
-            response.raise_for_status()
-            data = response.json()
-            prices = data['prices']
-            df = pd.DataFrame(prices, columns=['timestamp', 'price'])
-            df['date'] = pd.to_datetime(df['timestamp'], unit='ms').dt.date
-            df.set_index('date', inplace=True)
-            df.drop(columns=['timestamp'], inplace=True)
+            ticker = yf.Ticker("BTC-USD")
+            df = ticker.history(period="max")
+            df = df[['Close']].copy()
+            df.rename(columns={'Close': 'price'}, inplace=True)
+            df.index = pd.to_datetime(df.index).dt.date
+            df.index.name = 'date'
             
             # Remove duplicated dates if any
             df = df[~df.index.duplicated(keep='last')]
