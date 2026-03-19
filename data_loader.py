@@ -1,4 +1,4 @@
-import yfinance as yf
+import requests
 import pandas as pd
 import numpy as np
 import datetime
@@ -6,7 +6,7 @@ import time
 
 class DataLoader:
     def __init__(self):
-        self.api_url = "https://api.coingecko.com/api/v3"
+        self.api_url = "https://min-api.cryptocompare.com/data"
         # Known Halving dates
         self.halvings = [
             datetime.date(2012, 11, 28),
@@ -16,28 +16,34 @@ class DataLoader:
         ]
         
     def get_current_price_data(self):
-        """Fetches the current price and 24h change from yfinance."""
+        """Fetches the current price and 24h change from CryptoCompare."""
         try:
-            ticker = yf.Ticker("BTC-USD")
-            hist = ticker.history(period="5d")
-            current_price = float(hist['Close'].iloc[-1])
-            prev_price = float(hist['Close'].iloc[-2])
-            change_24h = ((current_price / prev_price) - 1) * 100
-            return {"price": current_price, "change_24h": change_24h}
+            url = f"{self.api_url}/pricemultifull?fsyms=BTC&tsyms=USD"
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            price = data['RAW']['BTC']['USD']['PRICE']
+            change_24h = data['RAW']['BTC']['USD']['CHANGEPCT24HOUR']
+            return {"price": float(price), "change_24h": float(change_24h)}
         except Exception as e:
             print(f"Error fetching real-time data: {e}")
             import streamlit as st
             st.warning("Using offline mode (API Rate Limited / Offline)")
             return {"price": 68450, "change_24h": -1.2}
     def get_historical_prices(self, days=365*12):
-        """Fetches historical daily prices using yfinance."""
+        """Fetches historical daily prices using CryptoCompare."""
         try:
-            ticker = yf.Ticker("BTC-USD")
-            df = ticker.history(period="max")
-            df = df[['Close']].copy()
-            df.rename(columns={'Close': 'price'}, inplace=True)
-            df.index = pd.to_datetime(df.index).dt.date
-            df.index.name = 'date'
+            url = f"{self.api_url}/v2/histoday?fsym=BTC&tsym=USD&allData=true"
+            response = requests.get(url, timeout=15)
+            response.raise_for_status()
+            data = response.json()
+            
+            prices = data['Data']['Data']
+            df = pd.DataFrame(prices)
+            df['date'] = pd.to_datetime(df['time'], unit='s').dt.date
+            df.rename(columns={'close': 'price'}, inplace=True)
+            df = df[['date', 'price']]
+            df.set_index('date', inplace=True)
             
             # Remove duplicated dates if any
             df = df[~df.index.duplicated(keep='last')]
