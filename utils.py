@@ -1,0 +1,50 @@
+def get_translation(lang, key):
+    translations = {
+        'en': {
+            'app_title': 'Bitcoin Cycle Predictor',
+            'predict_button': 'Predict',
+            'estimated_price': 'Estimated Price (Target Date)',
+            'current_price_label': 'Current Price:',
+            'lang_toggle': 'Language / Idioma',
+            'target_date': 'Target Date',
+            'bear_prob': 'Bear (-15%)',
+            'base_prob': 'Base',
+            'bull_prob': 'Bull (+15%)',
+            'market_phase': 'Market Phase',
+            'drawdown': 'Current Drawdown',
+            'days_since_ath': 'Days since ATH',
+            'ratio_applied': 'Ratio Applied',
+            'reference_cycle': 'Reference Cycle',
+            'auto': 'Auto',
+            'cycles_comparison': 'Cycle Projection (Days from ATH)',
+            'price': 'Price (USD)',
+            'days': 'Days from ATH',
+            'current_trajectory': 'Current Cycle',
+            'cycle_17': '2017 Cycle',
+            'cycle_21': '2021 Cycle'
+        },
+        'es': {
+            'app_title': 'Predictor de Ciclo Bitcoin',
+            'predict_button': 'Predecir',
+            'estimated_price': 'Precio Estimado (Fecha Objetivo)',
+            'current_price_label': 'Precio Actual:',
+            'lang_toggle': 'Language / Idioma',
+            'target_date': 'Fecha Objetivo Futura',
+            'bear_prob': 'Oso (-15%)',
+            'base_prob': 'Base',
+            'bull_prob': 'Toro (+15%)',
+            'market_phase': 'Fase de Mercado',
+            'drawdown': 'Drawdown Actual',
+            'days_since_ath': 'Días desde ATH',
+            'ratio_applied': 'Ratio Aplicado',
+            'reference_cycle': 'Ciclo de Referencia',
+            'auto': 'Automático',
+            'cycles_comparison': 'Proyección de Ciclo (Días desde ATH)',
+            'price': 'Precio (USD)',
+            'days': 'Días desde ATH',
+            'current_trajectory': 'Ciclo Actual',
+            'cycle_17': 'Ciclo 2017',
+            'cycle_21': 'Ciclo 2021'
+        }
+    }
+    return translations.get(lang, translations['en']).get(key, translations['en'].get(key, key))
