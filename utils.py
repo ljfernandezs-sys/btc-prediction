@@ -21,7 +21,8 @@ def get_translation(lang, key):
             'days': 'Days from ATH',
             'current_trajectory': 'Current Cycle',
             'cycle_17': '2017 Cycle',
-            'cycle_21': '2021 Cycle'
+            'cycle_21': '2021 Cycle',
+            'disclaimer': 'Disclaimer: The content of this application is offered exclusively for entertainment and informational purposes. It does not constitute, nor should it be interpreted as, financial, legal or investment advice. The cryptocurrency market is highly volatile; trade at your own risk and judgment.'
         },
         'es': {
             'app_title': 'Predictor de Ciclo Bitcoin',
@@ -44,7 +45,8 @@ def get_translation(lang, key):
             'days': 'Días desde ATH',
             'current_trajectory': 'Ciclo Actual',
             'cycle_17': 'Ciclo 2017',
-            'cycle_21': 'Ciclo 2021'
+            'cycle_21': 'Ciclo 2021',
+            'disclaimer': 'Descargo de responsabilidad: El contenido de esta aplicación se ofrece exclusivamente con fines de entretenimiento e informativos. No constituye, ni debe interpretarse como asesoramiento financiero, legal o de inversión. El mercado de criptoactivos es altamente volátil; opera bajo tu propio riesgo y criterio.'
         }
     }
     return translations.get(lang, translations['en']).get(key, translations['en'].get(key, key))

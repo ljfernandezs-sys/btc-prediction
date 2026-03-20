@@ -220,3 +220,7 @@ if st.session_state.data_loaded:
                 st.plotly_chart(fig, use_container_width=True)
             except Exception as e:
                 st.error(f"Error drawing chart: {e}")
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("---")
+    st.caption(f"<div style='text-align: center; color: #8b949e; font-size: 0.85rem;'>{t('disclaimer')}</div>", unsafe_allow_html=True)
