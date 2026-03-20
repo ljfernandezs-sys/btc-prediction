@@ -36,6 +36,31 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# ----------------- LOGIN SECTION -----------------
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.markdown("<br><br><br><h2 style='text-align: center; color: #c9d1d9;'>Acceso Institucional Privado</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #8b949e;'>Introduce tus credenciales para acceder al Predictor de Ciclo.</p>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        with st.form("login_form"):
+            username = st.text_input("Usuario", placeholder="Ingresa tu usuario...")
+            password = st.text_input("Contraseña", type="password", placeholder="Ingresa tu clave secreta...")
+            submitted = st.form_submit_button("Ingresar al Dashboard", use_container_width=True)
+            
+            if submitted:
+                if username.lower().strip() == "bitcoin" and password.lower().strip() == "bitcoin":
+                    st.session_state.authenticated = True
+                    st.rerun()
+                else:
+                    st.error("Credenciales incorrectas. Acceso denegado.")
+    # Detiene la ejecución del resto de la página si no está autenticado
+    st.stop()
+# -------------------------------------------------
+
 # Initialize Session State
 if 'lang' not in st.session_state:
     st.session_state.lang = 'es'
