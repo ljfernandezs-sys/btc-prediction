@@ -41,29 +41,29 @@ if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.markdown("<br><br><br><h2 style='text-align: center; color: #c9d1d9;'>Acceso Institucional Privado</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #8b949e;'>Introduce tus credenciales para acceder al Predictor de Ciclo.</p>", unsafe_allow_html=True)
+    st.markdown("<br><br><br><h2 style='text-align: center; color: #c9d1d9;'>Institutional Private Access</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #8b949e;'>Enter your credentials to access the Cycle Predictor.</p>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         with st.form("login_form"):
-            username = st.text_input("Usuario", placeholder="Ingresa tu usuario...")
-            password = st.text_input("Contraseña", type="password", placeholder="Ingresa tu clave secreta...")
-            submitted = st.form_submit_button("Ingresar al Dashboard", use_container_width=True)
+            username = st.text_input("Username", placeholder="")
+            password = st.text_input("Password", type="password", placeholder="")
+            submitted = st.form_submit_button("Secure Login", use_container_width=True)
             
             if submitted:
                 if username.lower().strip() == "bitcoin" and password.lower().strip() == "bitcoin":
                     st.session_state.authenticated = True
                     st.rerun()
                 else:
-                    st.error("Credenciales incorrectas. Acceso denegado.")
+                    st.error("Access Denied / Acceso Denegado.")
     # Detiene la ejecución del resto de la página si no está autenticado
     st.stop()
 # -------------------------------------------------
 
 # Initialize Session State
 if 'lang' not in st.session_state:
-    st.session_state.lang = 'es'
+    st.session_state.lang = 'en'
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
 
@@ -140,7 +140,7 @@ if st.session_state.data_loaded:
                     <h3>{t('estimated_price')}</h3>
                     <div class='hero-price'>${pred['estimated_price']:,.0f}</div>
                     <div style='margin-top: 10px; font-size: 1.1rem;'>
-                        Crecimiento desde nivel actual: <span class='{upside_class}'>{upside_sign}{upside:.1f}%</span>
+                        {t('growth')} <span class='{upside_class}'>{upside_sign}{upside:.1f}%</span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -171,7 +171,7 @@ if st.session_state.data_loaded:
                 """, unsafe_allow_html=True)
                 
             # Chart
-            st.markdown(f"<h3>Comparativa de Caídas (Alineado a 1 Año Post-ATH)</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3>{t('chart_title')}</h3>", unsafe_allow_html=True)
             try:
                 df = hist_df.copy()
                 curr_auth_date = aths['current']['date']
@@ -198,7 +198,7 @@ if st.session_state.data_loaded:
                             x=df_c['months_since'], 
                             y=df_c['pct_growth'], 
                             mode='lines', 
-                            name=f"{t(name_key)} (Inicio Alineado)", 
+                            name=f"{t(name_key)} {t('aligned_start')}", 
                             line=dict(color=color, width=2)
                         ))
 
@@ -220,7 +220,7 @@ if st.session_state.data_loaded:
                         x=df_curr['months_since'], 
                         y=df_curr['pct_growth'], 
                         mode='lines', 
-                        name=f"{t('current_trajectory')} (Inicio Alineado)", 
+                        name=f"{t('current_trajectory')} {t('aligned_start')}", 
                         line=dict(color='#56ff6a', width=3)
                     ))
                 
@@ -236,8 +236,8 @@ if st.session_state.data_loaded:
                 fig.update_layout(
                     paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
                     font=dict(color='#c9d1d9'),
-                    xaxis_title="Meses Transcurridos desde el ATH", 
-                    yaxis_title="% del Valor Máximo (ATH)",
+                    xaxis_title=t('months_axis'), 
+                    yaxis_title=t('pct_axis'),
                     yaxis=dict(ticksuffix="%"),
                     xaxis=dict(tick0=0, dtick=1), # Forzar que las marcas X sean números enteros de meses (1, 2, 3... 12)
                     margin=dict(l=0, r=0, t=30, b=0)
