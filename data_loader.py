@@ -16,32 +16,31 @@ class DataLoader:
         ]
         
     def get_current_price_data(self):
-        """Fetches the current price and 24h change from Binance."""
+        """Fetches the current price and 24h change from Kraken."""
         try:
-            url = "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
+            url = "https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD"
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
             data = response.json()
-            return {"price": float(data['lastPrice']), "change_24h": float(data['priceChangePercent'])}
+            # Kraken doesn't block US cloud IPs
+            price = data['result']['XXBTZUSD']['c'][0]
+            open_price = data['result']['XXBTZUSD']['o']
+            change_24h = ((float(price) / float(open_price)) - 1) * 100
+            return {"price": float(price), "change_24h": round(change_24h, 2)}
         except Exception as e:
             print(f"Error fetching real-time data: {e}")
             import streamlit as st
             st.warning("Using offline mode (API Rate Limited / Offline)")
             return {"price": 68450, "change_24h": -1.2}
     def get_historical_prices(self, days=365*12):
-        """Fetches historical daily prices using CryptoCompare."""
+        """Fetches historical daily prices using local CSV."""
         try:
-            url = "https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&allData=true"
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-            response = requests.get(url, headers=headers, timeout=15)
-            response.raise_for_status()
-            data = response.json()
-            
-            prices = data['Data']['Data']
-            df = pd.DataFrame(prices)
-            df['date'] = pd.to_datetime(df['time'], unit='s').dt.date
-            df.rename(columns={'close': 'price'}, inplace=True)
+            import os
+            # Use the local btc_history.csv file instead of public APIs
+            df = pd.read_csv("btc_history.csv")
+            df['date'] = pd.to_datetime(df['Date']).dt.date
+            df.rename(columns={'Close': 'price'}, inplace=True)
             df = df[['date', 'price']]
             df.set_index('date', inplace=True)
             
